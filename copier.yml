@@ -20,7 +20,7 @@ project_port:
 
 os:
   type: str
-  help: Operating system?
+  help: Operating system? To use mutagen if on mac.
   choices:
     - [Mac, mac]
     - [Win WSL, win]
@@ -66,15 +66,139 @@ rest_default:
   help: Do you want to use default for rest, and skip prompts? Answer NO to fine tune the environment.
   default: true
 
+xdebug:
+  type: bool
+  help: Enable XDEBUG on your PHP version?
+  default: false
+  when: "{{ not rest_default }}"
+
 mailhog:
   type: bool
   help: Enable mailhog?
   default: false
   when: "{{ not rest_default }}"
 
-xdebug:
+webserver:
+  type: str
+  help: Webserver to use?
+  choices:
+    - [Nginx, nginx]
+    - [Apache, apache]
+  default: nginx
+  when: "{{ not rest_default }}"  
+
+crond:
   type: bool
-  help: Enable XDEBUG on your PHP version?
+  help: Use CronD service?
+  default: false
+  when: "{{ not rest_default }}"
+
+database:
+  type: str
+  help: Database to use?
+  choices:
+    - [MariaDB, mariadb]
+    - [Postgres, postgres]
+  default: mariadb
+  when: "{{ not rest_default }}"  
+
+varnish:
+  type: bool
+  help: Use Varnish?
+  default: false
+  when: "{{ not rest_default }}"
+
+redis:
+  type: bool
+  help: Use Redis?
+  default: false
+  when: "{{ not rest_default }}"
+
+dbbrowser:
+  type: str
+  help: Use dabatase browser?
+  choices:
+    - [None, none]
+    - [Adminer, adminer]
+    - [PHPMyAdmin, phpmyadmin]
+  default: none
+  when: "{{ not rest_default }}"
+
+solr:
+  type: bool
+  help: Use SOLR?
+  default: false
+  when: "{{ not rest_default }}"
+
+zookeper:
+  type: bool
+  help: Use Zookeeper?
+  default: false
+  when: "{{ not rest_default }}"
+
+drupalnode:
+  type: bool
+  help: Use Drupal node?
+  default: false
+  when: "{{ not rest_default }}"
+
+memcached:
+  type: bool
+  help: Use Memcached?
+  default: false
+  when: "{{ not rest_default }}"
+
+rsyslog:
+  type: bool
+  help: Use Rsyslog?
+  default: false
+  when: "{{ not rest_default }}"
+
+athenapdf:
+  type: bool
+  help: Use Athena PDF?
+  default: false
+  when: "{{ not rest_default }}"
+
+node:
+  type: bool
+  help: Use Node?
+  default: false
+  when: "{{ not rest_default }}"
+
+webgrind:
+  type: bool
+  help: Use Webgrind?
+  default: false
+  when: "{{ not rest_default }}"
+
+elasticsearch:
+  type: bool
+  help: Use Elasticsearch?
+  default: false
+  when: "{{ not rest_default }}"
+
+kibana:
+  type: bool
+  help: Use Kibana?
+  default: false
+  when: "{{ not rest_default }}"  
+
+opensmtpd:
+  type: bool
+  help: Use Open smtpd?
+  default: false
+  when: "{{ not rest_default }}"
+
+chrome:
+  type: bool
+  help: Use Chrome?
+  default: false
+  when: "{{ not rest_default }}"
+
+xhprof:
+  type: bool
+  help: Use Xhprof?
   default: false
   when: "{{ not rest_default }}"
 
