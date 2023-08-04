@@ -1,0 +1,84 @@
+project_slug:
+  type: str
+  help: Project slug (used for url, and container name)?
+  validator: >-
+    {% if not (project_slug | regex_search("^[a-z][a-z0-9]+$")) %}
+    Project slug must start with a lowercase letter, followed by one or more lowercase letters and/or digits.
+    {% endif %}
+
+project_port:
+  type: int
+  help: Project port (8000 - 8999)?
+  default: "{{ range(8000, 8999)|random }}"
+  validator: >-
+    {% if project_port < 8000 %}
+    Project port must be greater than 8000.
+    {% endif %}
+    {% if project_port > 8999 %}
+    Project port must be smaller than 9000.
+    {% endif %}
+
+os:
+  type: str
+  help: Operating system?
+  choices:
+    - [Mac, mac]
+    - [Win WSL, win]
+    - [Linux, linux]
+  default: linux
+
+php:
+  type: str
+  help: PHP version to use?
+  choices:
+    - [PHP8.2, php82]
+    - [PHP8.1, php81]
+    - [PHP8.0, php80]
+  default: php82
+
+drupal:
+  type: str
+  help: Drupal version to use?
+  choices:
+    - [Drupal 10, d10]
+    - [Drupal 9, d9]
+    - [Drupal 7, d7]
+  default: d10
+
+name:
+  type: str
+  help: Your name (to be used in git config)?
+  validator: >-
+    {% if not name %}
+    Name is required, and can not be empty.
+    {% endif %}
+
+email:
+  type: str
+  help: Your email (to be used in git config)?
+  validator: >-
+    {% if not (email | regex_search("^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$")) %}
+    Email is required field and has to be valid format.
+    {% endif %}
+
+rest_default:
+  type: bool
+  help: Do you want to use default for rest, and skip prompts? Answer NO to fine tune the environment.
+  default: true
+
+mailhog:
+  type: bool
+  help: Enable mailhog?
+  default: false
+  when: "{{ not rest_default }}"
+
+xdebug:
+  type: bool
+  help: Enable XDEBUG on your PHP version?
+  default: false
+  when: "{{ not rest_default }}"
+
+_exclude:
+  - ".idea"
+  - ".git"
+  - "copier.yml"
