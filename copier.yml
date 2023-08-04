@@ -87,12 +87,6 @@ webserver:
   default: nginx
   when: "{{ not rest_default }}"  
 
-crond:
-  type: bool
-  help: Use CronD service?
-  default: false
-  when: "{{ not rest_default }}"
-
 database:
   type: str
   help: Database to use?
@@ -100,7 +94,13 @@ database:
     - [MariaDB, mariadb]
     - [Postgres, postgres]
   default: mariadb
-  when: "{{ not rest_default }}"  
+  when: "{{ not rest_default }}" 
+
+crond:
+  type: bool
+  help: Use CronD service?
+  default: false
+  when: "{{ not rest_default }}"
 
 varnish:
   type: bool
@@ -126,17 +126,11 @@ dbbrowser:
 
 solr:
   type: bool
-  help: Use SOLR?
+  help: Use SOLR with Zookeeper?
   default: false
   when: "{{ not rest_default }}"
 
-zookeper:
-  type: bool
-  help: Use Zookeeper?
-  default: false
-  when: "{{ not rest_default }}"
-
-drupalnode:
+dbbrowser:
   type: bool
   help: Use Drupal node?
   default: false
@@ -182,7 +176,7 @@ kibana:
   type: bool
   help: Use Kibana?
   default: false
-  when: "{{ not rest_default }}"  
+  when: "{{ not rest_default and elasticsearch}}"  
 
 opensmtpd:
   type: bool
@@ -190,15 +184,15 @@ opensmtpd:
   default: false
   when: "{{ not rest_default }}"
 
-chrome:
-  type: bool
-  help: Use Chrome?
-  default: false
-  when: "{{ not rest_default }}"
-
 xhprof:
   type: bool
   help: Use Xhprof?
+  default: false
+  when: "{{ not rest_default }}"
+
+chrome:
+  type: bool
+  help: Use Chrome?
   default: false
   when: "{{ not rest_default }}"
 
