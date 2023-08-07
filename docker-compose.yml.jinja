@@ -21,8 +21,7 @@ services:
     container_name: "${PROJECT_NAME}_php"
     environment:
       {%- if mailhog %}
-      SSMTP_MAILHUB: mailhog:1025
-      {%- endif %}
+      SSMTP_MAILHUB: mailhog:1025    
       {%- elif opensmtpd %}
       SSMTP_MAILHUB: opensmtpd:25
       {%- endif %}
