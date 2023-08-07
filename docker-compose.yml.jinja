@@ -37,24 +37,32 @@ services:
       PHP_FPM_GROUP: wodby
 #      COLUMNS: 80 # Set 80 columns for docker exec -it.
 #      # Read instructions at https://wodby.com/docs/stacks/php/local/#xdebug
-#      PHP_XDEBUG: 1
-#      PHP_XDEBUG_MODE: debug
+      {%- if xdebug %}
+      PHP_XDEBUG: 1
+      PHP_XDEBUG_MODE: debug
 #      PHP_XDEBUG_MODE: profile
 #      PHP_XDEBUG_USE_COMPRESSION: false
 #      PHP_IDE_CONFIG: serverName=my-ide
 #      PHP_XDEBUG_IDEKEY: "my-ide"
-#      PHP_XDEBUG_CLIENT_HOST: 172.17.0.1 # Linux
-#      PHP_XDEBUG_CLIENT_HOST: host.docker.internal # Docker 18.03+ Mac/Win
+      {%- if os == 'linux' %}
+      PHP_XDEBUG_CLIENT_HOST: 172.17.0.1 # Linux
+      {%- else %}
+      PHP_XDEBUG_CLIENT_HOST: host.docker.internal # Docker 18.03+ Mac/Win
 #      PHP_XDEBUG_CLIENT_HOST: 10.0.75.1 # Windows, Docker < 18.03
-#      PHP_XDEBUG_LOG: /tmp/php-xdebug.log
+      {%- endif %}
+      PHP_XDEBUG_LOG: /tmp/php-xdebug.log
+      {%- endif %}
 #      # PHPUnit Drupal testing configurations
       SIMPLETEST_BASE_URL: "http://nginx"
       SIMPLETEST_DB: "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}#tests_"
       MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-gpu","--headless"]}}, "http://chrome:9515"]'
     volumes:
+      {%- if os == 'linux' or os == 'win' %}
       - ./html:/var/www/html:cached
-## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
-#    - drupal:/var/www/html
+      {%- elif os == 'mac' %}
+      ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
+      - drupal:/var/www/html
+      {%- endif %}
 ## For XHProf and Xdebug profiler traces
 #    - files:/mnt/files
 
