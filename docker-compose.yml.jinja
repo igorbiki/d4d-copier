@@ -59,7 +59,7 @@ services:
     volumes:
       {%- if os == 'linux' or os == 'win' %}
       - ./html:/var/www/html:cached
-      {%- elif os == 'mac' %}
+      {%- else %}
       ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
       - drupal:/var/www/html
       {%- endif %}
@@ -75,9 +75,12 @@ services:
       CRONTAB: "0 * * * * drush -r /var/www/html/web cron"
     command: sudo -E crond -f -d 0
     volumes:
+      {%- if os == 'linux' or os == 'win' %}
       - ./html:/var/www/html:cached
-## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
-#    - drupal:/var/www/html
+      {%- else %}
+      ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
+      - drupal:/var/www/html
+      {%- endif %}
 {%- endif %}
 
 {%- if webserver == 'nginx' %}
@@ -95,9 +98,12 @@ services:
       NGINX_VHOST_PRESET: $NGINX_VHOST_PRESET
     #      NGINX_DRUPAL_FILE_PROXY_URL: http://example.com
     volumes:
+      {%- if os == 'linux' or os == 'win' %}
       - ./html:/var/www/html:cached
-## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
-#    - drupal:/var/www/html
+      {%- else %}
+      ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
+      - drupal:/var/www/html
+      {%- endif %}
     labels:
       - "traefik.http.routers.${PROJECT_NAME}_nginx.rule=Host(`${PROJECT_BASE_URL}`)"
 {%- endif %}
@@ -141,9 +147,12 @@ services:
       APACHE_VHOST_PRESET: php
       APACHE_DOCUMENT_ROOT: /var/www/html/web
     volumes:
+      {%- if os == 'linux' or os == 'win' %}
       - ./html:/var/www/html:cached
-# Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
-#    - drupal:/var/www/html
+      {%- else %}
+      # Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
+      - drupal:/var/www/html
+      {%- endif %}
     labels:
       - "traefik.http.routers.${PROJECT_NAME}_apache.rule=Host(`${PROJECT_BASE_URL}`)"
 {%- endif %}
