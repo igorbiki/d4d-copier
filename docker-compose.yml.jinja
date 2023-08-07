@@ -21,9 +21,9 @@ services:
     container_name: "${PROJECT_NAME}_php"
     environment:
       SSMTP_MAILHUB: mailhog:1025
-      {% if opensmtpd %}
+      {%- if opensmtpd %}
       SSMTP_MAILHUB: opensmtpd:25
-      {%- endif -%}
+      {%- endif %}
       PHP_SENDMAIL_PATH: '"/usr/bin/dos2unix -u | /usr/sbin/ssmtp -t -f"'
 #      DB_HOST: $DB_HOST
 #      DB_PORT: $DB_PORT
@@ -51,13 +51,13 @@ services:
       SIMPLETEST_DB: "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}#tests_"
       MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-gpu","--headless"]}}, "http://chrome:9515"]'
     volumes:
-    - ./html:/var/www/html:cached
+      - ./html:/var/www/html:cached
 ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
 #    - drupal:/var/www/html
 ## For XHProf and Xdebug profiler traces
 #    - files:/mnt/files
 
-{% if crond -%}
+{%- if crond %}
   crond:
     image: wodby/drupal-php:$PHP_TAG
     container_name: "${PROJECT_NAME}_crond"
@@ -68,9 +68,9 @@ services:
     - ./html:/var/www/html:cached
 ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
 #    - drupal:/var/www/html
-{%- endif -%}
+{%- endif %}
 
-{% if nginx -%}
+{%+ if webserver == 'nginx' %}
   nginx:
     image: wodby/nginx:$NGINX_TAG
     container_name: "${PROJECT_NAME}_nginx"
@@ -84,23 +84,23 @@ services:
       NGINX_VHOST_PRESET: $NGINX_VHOST_PRESET
     #      NGINX_DRUPAL_FILE_PROXY_URL: http://example.com
     volumes:
-    - ./html:/var/www/html:cached
+      - ./html:/var/www/html:cached
 ## Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
 #    - drupal:/var/www/html
     labels:
-    - "traefik.http.routers.${PROJECT_NAME}_nginx.rule=Host(`${PROJECT_BASE_URL}`)"
-{%- endif -%}
+      - "traefik.http.routers.${PROJECT_NAME}_nginx.rule=Host(`${PROJECT_BASE_URL}`)"
+{%- endif %}
 
-{% if mailhog %}
+{%+ if mailhog -%}
   mailhog:
     image: mailhog/mailhog
     container_name: "${PROJECT_NAME}_mailhog"
     labels:
-    - "traefik.http.services.${PROJECT_NAME}_mailhog.loadbalancer.server.port=8025"
-    - "traefik.http.routers.${PROJECT_NAME}_mailhog.rule=Host(`mailhog.${PROJECT_BASE_URL}`)"
-{%- endif -%}
+      - "traefik.http.services.${PROJECT_NAME}_mailhog.loadbalancer.server.port=8025"
+      - "traefik.http.routers.${PROJECT_NAME}_mailhog.rule=Host(`mailhog.${PROJECT_BASE_URL}`)"
+{%- endif %}
 
-{% if postgres -%}
+{%+ if postgres -%}
  postgres:
    image: wodby/postgres:$POSTGRES_TAG
    container_name: "${PROJECT_NAME}_postgres"
@@ -111,23 +111,23 @@ services:
      POSTGRES_USER: $DB_USER
      POSTGRES_DB_EXTENSIONS: pg_trgm
    volumes:
-   - ./postgres-init:/docker-entrypoint-initdb.d # Place init file(s) here.
-   - /path/to/postgres/data/on/host:/var/lib/postgresql/data # Use bind mount
-{%- endif -%}
+    - ./postgres-init:/docker-entrypoint-initdb.d # Place init file(s) here.
+    - /path/to/postgres/data/on/host:/var/lib/postgresql/data # Use bind mount
+{%- endif %}
 
-{% if apache -%}
+{%+ if apache -%}
  apache:
    image: wodby/apache:$APACHE_TAG
    container_name: "${PROJECT_NAME}_apache"
    depends_on:
-   - php
+    - php
    environment:
      APACHE_LOG_LEVEL: debug
      APACHE_BACKEND_HOST: php
      APACHE_VHOST_PRESET: php
      APACHE_DOCUMENT_ROOT: /var/www/html/web
    volumes:
-   - ./html:/var/www/html:cached
+    - ./html:/var/www/html:cached
 # Alternative for macOS users: Mutagen https://wodby.com/docs/stacks/drupal/local#docker-for-mac
 #    - drupal:/var/www/html
    labels:
@@ -139,7 +139,7 @@ services:
    image: wodby/varnish:$VARNISH_TAG
    container_name: "${PROJECT_NAME}_varnish"
    depends_on:
-   - nginx
+    - nginx
    environment:
      VARNISH_SECRET: secret
      VARNISH_BACKEND_HOST: nginx
@@ -147,17 +147,17 @@ services:
      VARNISH_CONFIG_PRESET: drupal
      VARNISH_ALLOW_UNRESTRICTED_PURGE: 1
    labels:
-   - "traefik.http.services.${PROJECT_NAME}_varnish.loadbalancer.server.port=6081"
-   - "traefik.http.routers.${PROJECT_NAME}_varnish.rule=Host(`varnish.${PROJECT_BASE_URL}`)"
-{%- endif -%}
+    - "traefik.http.services.${PROJECT_NAME}_varnish.loadbalancer.server.port=6081"
+    - "traefik.http.routers.${PROJECT_NAME}_varnish.rule=Host(`varnish.${PROJECT_BASE_URL}`)"
+{%- endif %}
 
-{% if redis %}
+{% if redis -%}
  redis:
    container_name: "${PROJECT_NAME}_redis"
    image: wodby/redis:$REDIS_TAG
 {%- endif -%}
 
-{% if dbbrowser == 'adminer' %}
+{% if dbbrowser == 'adminer' -%}
  adminer:
    container_name: "${PROJECT_NAME}_adminer"
    image: wodby/adminer:$ADMINER_TAG
@@ -179,9 +179,9 @@ services:
      UPLOAD_LIMIT: 1G
    labels:
    - "traefik.http.routers.${PROJECT_NAME}_pma.rule=Host(`pma.${PROJECT_BASE_URL}`)"
-{%- endif -%}
+{%- endif %}
 
-{% if solr %}
+{% if solr -%}
  solr:
    image: wodby/solr:$SOLR_TAG
    container_name: "${PROJECT_NAME}_solr"
@@ -190,10 +190,10 @@ services:
      ZK_HOST: zookeeper:2181
      SOLR_HEAP: 1024m
    depends_on:
-   - zookeeper
+    - zookeeper
    labels:
-   - "traefik.http.services.${PROJECT_NAME}_solr.loadbalancer.server.port=8983"
-   - "traefik.http.routers.${PROJECT_NAME}_solr.rule=Host(`solr.${PROJECT_BASE_URL}`)"
+    - "traefik.http.services.${PROJECT_NAME}_solr.loadbalancer.server.port=8983"
+    - "traefik.http.routers.${PROJECT_NAME}_solr.rule=Host(`solr.${PROJECT_BASE_URL}`)"
 
  zookeeper:
    image: zookeeper:$ZOOKEEPER_TAG
@@ -202,9 +202,9 @@ services:
      ZOO_MY_ID: 1
      ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
      ZOO_4LW_COMMANDS_WHITELIST: mntr, conf, ruok
-{%- endif -%}
+{%- endif %}
 
-{% if dbbrowser %}
+{% if dbbrowser -%}
  drupal-node:
    image: wodby/drupal-node:$DRUPAL_NODE_TAG
    container_name: "${PROJECT_NAME}_drupal_nodejs"
@@ -212,21 +212,21 @@ services:
    - "traefik.http.routers.${PROJECT_NAME}_drupal_node.rule=Host(`drupal_node.${PROJECT_BASE_URL}`)"
    environment:
      NODE_SERVICE_KEY: node-service-key
-{%- endif -%}
+{%- endif %}
 
-{% if memcached %}
+{% if memcached -%}
  memcached:
    container_name: "${PROJECT_NAME}_memcached"
    image: wodby/memcached:$MEMCACHED_TAG
 {%- endif -%}
 
-{% if rsyslog %}
+{% if rsyslog -%}
  rsyslog:
    container_name: "${PROJECT_NAME}_rsyslog"
    image: wodby/rsyslog:$RSYSLOG_TAG
-{%- endif -%}
+{%- endif %}
 
-{% if athenapdf %}
+{%- if athenapdf %}
  athenapdf:
    image: arachnysdocker/athenapdf-service:$ATHENAPDF_TAG
    container_name: "${PROJECT_NAME}_athenapdf"
@@ -237,37 +237,37 @@ services:
      WEAVER_MAX_CONVERSION_QUEUE: 50
      WEAVER_WORKER_TIMEOUT: 90
      WEAVER_CONVERSION_FALLBACK: "false"
-{%- endif -%}
+{%- endif %}
 
-{% if node %}
+{% if node -%}
  node:
    image: wodby/node:$NODE_TAG
    container_name: "${PROJECT_NAME}_node"
    working_dir: /var/www/html/path/to/theme/to/build
    labels:
-   - "traefik.http.services.${PROJECT_NAME}_node.loadbalancer.server.port=3000"
-   - "traefik.http.routers.${PROJECT_NAME}_node.rule=Host(`node.${PROJECT_BASE_URL}`)"
+    - "traefik.http.services.${PROJECT_NAME}_node.loadbalancer.server.port=3000"
+    - "traefik.http.routers.${PROJECT_NAME}_node.rule=Host(`node.${PROJECT_BASE_URL}`)"
    expose:
-   - "3000"
+    - "3000"
    volumes:
-   - ./html:/var/www/html
+    - ./html:/var/www/html
    command: sh -c 'yarn install && yarn run start'
-{%- endif -%}
+{%- endif %}
 
-{% if webgrind %}
+{% if webgrind -%}
  webgrind:
    image: wodby/webgrind:$WEBGRIND_TAG
    container_name: "${PROJECT_NAME}_webgrind"
    environment:
      WEBGRIND_PROFILER_DIR: /mnt/files/xdebug
    labels:
-   - "traefik.http.routers.${PROJECT_NAME}_webgrind.rule=Host(`webgrind.${PROJECT_BASE_URL}`)"
+    - "traefik.http.routers.${PROJECT_NAME}_webgrind.rule=Host(`webgrind.${PROJECT_BASE_URL}`)"
    volumes:
-   - files:/mnt/files
-   - ./html:/mnt/codebase:cached
-{%- endif -%}
+    - files:/mnt/files
+    - ./html:/mnt/codebase:cached
+{%- endif %}
 
-{% if elasticsearch %}
+{% if elasticsearch -%}
  elasticsearch:
    image: wodby/elasticsearch:$ELASTICSEARCH_TAG
    container_name: "${PROJECT_NAME}_elasticsearch"
@@ -277,26 +277,26 @@ services:
      memlock:
        soft: -1
        hard: -1
-{%- endif -%}
+{%- endif %}
 
-{% if kibana %}
+{% if kibana -%}
  kibana:
    image: wodby/kibana:$KIBANA_TAG
    container_name: "${PROJECT_NAME}_kibana"
    depends_on:
-   - elasticsearch
+    - elasticsearch
    labels:
-   - "traefik.http.services.${PROJECT_NAME}_kibana.loadbalancer.server.port=5601"
-   - "traefik.http.routers.${PROJECT_NAME}_kibana.rule=Host(`kibana.${PROJECT_BASE_URL}`)"
-{%- endif -%}
+    - "traefik.http.services.${PROJECT_NAME}_kibana.loadbalancer.server.port=5601"
+    - "traefik.http.routers.${PROJECT_NAME}_kibana.rule=Host(`kibana.${PROJECT_BASE_URL}`)"
+{%- endif %}
 
-{% if opensmtpd %}
+{% if opensmtpd -%}
  opensmtpd:
    container_name: "${PROJECT_NAME}_opensmtpd"
    image: wodby/opensmtpd:$OPENSMTPD_TAG
-{%- endif -%}
+{%- endif %}
 
-{% if xhprof %}
+{% if xhprof -%}
  xhprof:
    image: wodby/xhprof:$XHPROF_TAG
    container_name: "${PROJECT_NAME}_xhprof"
@@ -305,9 +305,9 @@ services:
    - files:/mnt/files
    labels:
    - "traefik.http.routers.${PROJECT_NAME}_xhprof.rule=Host(`xhprof.${PROJECT_BASE_URL}`)"
-{%- endif -%}
+{%- endif %}
 
-{% if chrome %}
+{% if chrome -%}
  chrome:
    image: selenium/standalone-chrome:$SELENIUM_CHROME_TAG
    container_name: "${PROJECT_NAME}_chrome"
@@ -320,7 +320,7 @@ services:
    - "--log-path=/tmp/chromedriver.log"
    - "--verbose"
    - "--whitelisted-ips="
-{%- endif -%}
+{%- endif %}
 
   traefik:
     image: traefik:v2.0
@@ -332,7 +332,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-{% if os == "mac" %}
+{% if os == "mac" -%}
 x-mutagen:
  sync:
    defaults:
@@ -342,7 +342,7 @@ x-mutagen:
        - .DS_Store
        - .history
        - .idea
-   drupal:
+   {{ project_slug }}-mutagen:
      alpha: "./html"
      beta: "volume://drupal"
      configurationBeta:
@@ -355,7 +355,7 @@ x-mutagen:
 
 volumes:
 ## For macOS users (Mutagen)
-{% if os == "mac" %}
+{% if os == "mac" -%}
   drupal:
 {%- endif -%}
 # For Xdebug profiler
